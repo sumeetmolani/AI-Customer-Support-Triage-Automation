@@ -22,7 +22,7 @@ The AI also determines:
 - Sentiment
 - Whether human intervention is required
 - Reason for the classification
-- [Alt Text](screenshot/AI Customer Support Automation screenshot.png)
+- [Alt Text]([screenshot/AI Customer Support Automation screenshot.png](https://github.com/sumeetmolani/AI-Customer-Support-Triage-Automation/blob/f639860c281de553d37fe58104d1c04e4bcb94e9/screenshot/AI%20Customer%20Support%20Automation%20screenshot%20.png))
 
 ---
 
