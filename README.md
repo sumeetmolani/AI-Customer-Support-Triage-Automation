@@ -1,7 +1,12 @@
 AI Customer Support Triage Automation
-AI-powered customer-support classification and routing workflow built with self-hosted n8n, Google Forms, Google Sheets, Google Gemini, JavaScript, and JSON.
+AI-powered customer-support classification and routing workflow built with self-hosted n8n. 
+Google Forms
+Google Sheets
+Google Gemini
+JavaScript
+JSON
 1. Project Overview
-This project automates the first stage of customer-support triage.
+   This project automates the first stage of customer-support triage.
 Customer requests are collected through Google Forms and stored in Google Sheets. A self-hosted n8n workflow reads the requests, standardises the data, validates the input, processes requests individually, sends the request to Google Gemini for AI classification, converts the AI response into structured JSON, and routes the result through a Switch node.
 The workflow classifies requests into:
 •	Sales
@@ -16,7 +21,7 @@ The AI also determines:
 •	Reason for the classification
 ________________________________________
 2. Workflow Architecture
-Google Form
+   Google Form
      │
      ▼
 Google Sheets
@@ -43,26 +48,26 @@ Switch
 Sales Support Billing   General   Urgent
 ________________________________________
 3. Tools & Technologies
-Tool / Technology	Purpose
-n8n 2.25.7	Self-hosted workflow automation platform
-Google Forms	Collects customer requests
-Google Sheets	Stores customer submissions
-Google Gemini	AI-powered request classification
-AI Agent	Sends customer information to the AI model according to the classification instructions
-JavaScript	Processes and transforms AI output
-JSON	Structured data format between workflow nodes
-IF	Input validation and conditional logic
-Loop Over Items	Processes requests individually
-Switch	Routes requests to category-specific outputs
+Tool / Technology	          Purpose
+n8n 2.25.7	               Self-hosted workflow automation platform
+Google Forms	               Collects customer requests
+Google Sheets	               Stores customer submissions
+Google Gemini	               AI-powered request classification
+AI Agent	                    Sends customer information to the AI model according to the classification instructions
+JavaScript	               Processes and transforms AI output
+JSON	                         Structured data format between workflow nodes
+IF	                         Input validation and conditional logic
+Loop Over Items	          Processes requests individually
+Switch	                    Routes requests to category-specific outputs
 ________________________________________
 4. AI Classification Output
-The AI produces the following structure:
-{
-  "category": "sales|support|billing|general|urgent",
-  "priority": "low|medium|high|critical",
-  "sentiment": "positive|neutral|negative",
-  "needs_human": true,
-  "reason": "Brief explanation of the classification"
+   The AI produces the following structure:
+   {
+   "category": "sales|support|billing|general|urgent",
+   "priority": "low|medium|high|critical",
+   "sentiment": "positive|neutral|negative",
+   "needs_human": true,
+   "reason": "Brief explanation of the classification"
 }
 Classification categories
 Sales
@@ -83,7 +88,7 @@ Billing
 Examples:
 •	Incorrect invoices
 •	Payment problems
-•	Refund requests
+•	Refund request
 •	Billing disputes
 General
 Examples:
