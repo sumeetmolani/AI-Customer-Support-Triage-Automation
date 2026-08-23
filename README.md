@@ -22,6 +22,7 @@ The AI also determines:
 - Sentiment
 - Whether human intervention is required
 - Reason for the classification
+- [Alt Text](screenshot/AI Customer Support Automation screenshot.png)
 
 ---
 
