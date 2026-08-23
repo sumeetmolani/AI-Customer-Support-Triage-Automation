@@ -6,7 +6,7 @@
 
 This project automates the first stage of customer-support triage.
 
-Customer requests are collected through Google Forms and stored in Google Sheets. A self-hosted n8n workflow reads the requests, standardizes the data, validates the input, processes requests individually, sends the request to Google Gemini for AI classification, converts the AI response into structured JSON, and routes the result through a Switch node.
+Customer requests are collected through Google Forms and stored in Google Sheets. A self-hosted n8n workflow reads the requests, standardises the data, validates the input, processes requests individually, sends the request to Google Gemini for AI classification, converts the AI response into structured JSON, and routes the result through a Switch node.
 
 The workflow classifies requests into:
 
@@ -93,7 +93,7 @@ Google Form submissions are stored as rows in the spreadsheet. n8n reads those r
   "company": "FinTech Solutions",
   "request_type": "Technical Support",
   "subject": "Production system is down",
-  "message": "Our production integration has stopped completely and customers are unable to submit requests.",
+  "message": "Our production integration has stopped completely, and customers are unable to submit requests.",
   "urgency": "Critical",
   "contact_method": "Phone"
 }
@@ -113,7 +113,7 @@ It provides a simple cloud-based data source that integrates directly with n8n a
 
 ### Purpose
 
-The Edit Fields node standardizes the incoming Google Sheets data.
+The Edit Fields node standardises the incoming Google Sheets data.
 
 For example, long form column names can be mapped to simple internal fields:
 
@@ -211,7 +211,7 @@ The AI Agent is the intelligence layer of the workflow.
 
 It receives the customer's structured information and follows the classification instructions.
 
-The agent is asked to analyze:
+The agent is asked to analyse:
 
 ```text
 Customer
@@ -231,7 +231,7 @@ Traditional workflow conditions are good at checking exact values, but they are 
 
 For example:
 
-> "Our production integration has stopped completely and customers are unable to submit requests."
+> "Our production integration has stopped completely, and customers are unable to submit requests."
 
 The AI can interpret this as an operational outage and classify it as urgent.
 
@@ -251,7 +251,7 @@ The AI Agent handles the agent instructions and workflow integration, while Gemi
 
 ### Why we use it
 
-Gemini analyzes customer messages and produces the classification information required by the workflow.
+Gemini analyses customer messages and produces the classification information required by the workflow.
 
 Example:
 
@@ -517,7 +517,7 @@ This project demonstrates:
 - Deterministic routing
 - API rate-limit awareness
 - Error troubleshooting
-- Data normalization
+- Data normalisation
 
 ---
 
@@ -527,7 +527,7 @@ This project demonstrates:
 
 - Customer data collection
 - Google Sheets integration
-- Data normalization
+- Data normalisation
 - Input validation
 - Individual item processing
 - AI classification
