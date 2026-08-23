@@ -1,26 +1,21 @@
-**AI Customer Support Triage Automation**
-AI-powered customer-support classification and routing workflow built with self-hosted n8n
-**Google Forms,
-Google Sheets,
-Google Gemini,
-JavaScript, 
-JSON.**
-**1. Project Overview**
+AI Customer Support Triage Automation
+AI-powered customer-support classification and routing workflow built with self-hosted n8n, Google Forms, Google Sheets, Google Gemini, JavaScript, and JSON.
+1. Project Overview
 This project automates the first stage of customer-support triage.
-Customer requests are collected through Google Forms and stored in Google Sheets. A self-hosted n8n workflow reads the requests, standardises the data, validates the input, processes requests individually, sends the request to Google Gemini for AI classification, converts the AI response into structured JSON, and routes the result through a Switch node.
+Customer requests are collected through Google Forms and stored in Google Sheets. A self-hosted n8n workflow reads the requests, standardizes the data, validates the input, processes requests individually, sends the request to Google Gemini for AI classification, converts the AI response into structured JSON, and routes the result through a Switch node.
 The workflow classifies requests into:
 •	Sales
 •	Support
 •	Billing
 •	General
 •	Urgent
-**The AI also determines:**
+The AI also determines:
 •	Priority
 •	Sentiment
 •	Whether human intervention is required
 •	Reason for the classification
 ________________________________________
-**2. Workflow Architecture**
+2. Workflow Architecture
 Google Form
      │
      ▼
@@ -47,7 +42,7 @@ Switch
  ▼   ▼        ▼          ▼         ▼
 Sales Support Billing   General   Urgent
 ________________________________________
-**3. Tools & Technologies**
+3. Tools & Technologies
 Tool / Technology	Purpose
 n8n 2.25.7	Self-hosted workflow automation platform
 Google Forms	Collects customer requests
@@ -60,8 +55,8 @@ IF	Input validation and conditional logic
 Loop Over Items	Processes requests individually
 Switch	Routes requests to category-specific outputs
 ________________________________________
-**4. Node-by-Node Explanation**
-**4.1 Google Sheets**
+4. Node-by-Node Explanation
+4.1 Google Sheets
 Purpose
 Google Sheets is the workflow's input/data source.
 Google Form submissions are stored as rows in the spreadsheet. n8n reads those rows and passes the customer information into the automation.
@@ -81,9 +76,9 @@ It provides a simple cloud-based data source that integrates directly with n8n a
 Documentation
 n8n Google Sheets documentation
 ________________________________________
-**4.2 Edit Fields**
+4.2 Edit Fields
 Purpose
-The Edit Fields node standardises the incoming Google Sheets data.
+The Edit Fields node standardizes the incoming Google Sheets data.
 For example, long form column names can be mapped to simple internal fields:
 Message / Request Details
         ↓
@@ -99,11 +94,11 @@ urgency
 contact_method
 timestamp
 Why we use it
-Standardised field names make expressions, AI prompts, JavaScript, and downstream routing easier to maintain.
+Standardized field names make expressions, AI prompts, JavaScript, and downstream routing easier to maintain.
 Documentation
 n8n Edit Fields documentation
 ________________________________________
-**4.3 IF**
+4.3 IF
 Purpose
 The IF node provides conditional validation before the request reaches the AI stage.
 For example, required customer information can be checked before processing.
@@ -120,7 +115,7 @@ This is especially useful because sending empty requests to an external AI API w
 Documentation
 n8n IF documentation
 ________________________________________
-**4.4 Loop Over Items**
+4.4 Loop Over Items
 Purpose
 Loop Over Items processes incoming records in controlled batches.
 For this project, the workflow uses:
@@ -132,11 +127,11 @@ It also makes testing individual customer records easier.
 Documentation
 n8n Loop Over Items documentation
 ________________________________________
-**4.5 AI Agent**
+4.5 AI Agent
 Purpose
 The AI Agent is the intelligence layer of the workflow.
 It receives the customer's structured information and follows the classification instructions.
-The agent is asked to analyse:
+The agent is asked to analyze:
 Customer
 Company
 Request Type
@@ -153,12 +148,12 @@ The AI can interpret this as an operational outage and classify it as urgent.
 Documentation
 n8n AI Agent documentation
 ________________________________________
-**4.6 Google Gemini Chat Model**
+4.6 Google Gemini Chat Model
 Purpose
 The Gemini Chat Model provides the language model used by the AI Agent.
 The AI Agent handles the agent instructions and workflow integration, while Gemini performs the natural-language analysis.
 Why we use it
-Gemini analyses customer messages and produces the classification information required by the workflow.
+Gemini analyzes customer messages and produces the classification information required by the workflow.
 Example:
 {
   "category": "urgent",
@@ -170,7 +165,7 @@ Example:
 Documentation
 n8n Google Gemini documentation
 ________________________________________
-**4.7 Code**
+4.7 Code
 Purpose
 The Code node processes the AI response using JavaScript.
 During testing, Gemini could return JSON wrapped inside Markdown code fences:
@@ -207,7 +202,7 @@ $json.needs_human
 Documentation
 n8n Code node documentation
 ________________________________________
-**4.8 Switch**
+4.8 Switch
 Purpose
 The Switch node performs deterministic routing based on the AI classification.
 The workflow checks:
@@ -234,13 +229,13 @@ urgent
   ↓
 Urgent output
 Why we use it
-The AI understands and classifies the customer request.
-The Switch node handles deterministic workflow routing.
+The AI is responsible for understanding and classifying the customer request.
+The Switch node is responsible for deterministic workflow routing.
 This separation makes the automation easier to control and maintain.
 Documentation
 n8n Switch documentation
 ________________________________________
-**5. AI Classification Output**
+5. AI Classification Output
 The AI produces the following structure:
 {
   "category": "sales|support|billing|general|urgent",
@@ -282,7 +277,7 @@ Examples:
 •	Severe operational problem
 •	Security incident
 ________________________________________
-#6. Example Test Data
+6. Example Test Data
 The workflow was tested with customer requests representing different business scenarios.
 Customer	Request	Expected Category
 Ali Khan	Automation services pricing	Sales
@@ -291,7 +286,7 @@ Sara Ali	Incorrect invoice amount	Billing
 Usman Ahmed	Available services and process information	General
 Hamza Shah	Production system completely down	Urgent
 ________________________________________
-**7. Example End-to-End Processing**
+7. Example End-to-End Processing
 Example:
 Customer request
       ↓
@@ -325,7 +320,7 @@ Expected AI result:
   "reason": "The customer's production integration is completely unavailable and requires immediate intervention."
 }
 ________________________________________
-**8. Key Automation Concepts Demonstrated**
+8. Key Automation Concepts Demonstrated
 This project demonstrates:
 •	Self-hosted n8n
 •	Workflow orchestration
@@ -340,13 +335,13 @@ This project demonstrates:
 •	Deterministic routing
 •	API rate-limit awareness
 •	Error troubleshooting
-•	Data normalisation
+•	Data normalization
 ________________________________________
-**9. Project Scope**
+9. Project Scope
 Implemented
 •	Customer data collection
 •	Google Sheets integration
-•	Data normalisation
+•	Data normalization
 •	Input validation
 •	Individual item processing
 •	AI classification
@@ -366,7 +361,7 @@ The following were intentionally not added to this workflow:
 •	Production monitoring dashboard
 These can be added as separate automation projects or future extensions.
 ________________________________________
-**10. Documentation References**
+10. Documentation References
 Official documentation used for the technologies in this project:
 •	n8n Documentation
 •	n8n Google Sheets
@@ -378,7 +373,7 @@ Official documentation used for the technologies in this project:
 •	n8n Code
 •	n8n Switch
 ________________________________________
-**11. Portfolio Description**
+11. Portfolio Description
 AI Customer Support Triage Automation
 Built a self-hosted n8n automation workflow that collects customer requests from Google Forms/Google Sheets, validates and standardises the data, uses Google Gemini to classify natural-language requests by business category and priority, transforms the AI response into structured JSON using JavaScript, and deterministically routes requests through a Switch node.
 Technologies: n8n, Google Forms, Google Sheets, Google Gemini, JavaScript, JSON, AI automation, workflow orchestration.
