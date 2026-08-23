@@ -1,0 +1,999 @@
+{
+  "name": "AI Customer Support Automation final v",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13rbvDK1zI2zWjCMLUH4jUrVRB_dezN3rYpEHxCkd3vw",
+          "mode": "list",
+          "cachedResultName": "Contact Us (Responses)",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 764081754,
+          "mode": "list",
+          "cachedResultName": "Form responses 1",
+          "cachedResultUrl": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        -128
+      ],
+      "id": "d53f3c35-29ef-4910-96ec-265b452f93d4",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "01sCOlup6VdDxiRC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dc1171fe-cbc7-42de-bd00-11c7ac478013",
+              "name": "customer_name",
+              "value": "={{ $json[\"Full Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "1f31f488-4e2b-41e7-9eca-e254d8175218",
+              "name": "customer_email",
+              "value": "={{ $json[\"Email Address\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "474174a0-03f5-4239-a8f9-2397539bac8f",
+              "name": "company ",
+              "value": "={{ $json[\"Company Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "4e07fe85-701c-49c8-8957-1c1a87ce82e3",
+              "name": " request_type",
+              "value": "={{ $json[\"Request Type\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "edce100c-c2e0-46ca-9028-aa5c5837b3e4",
+              "name": "subject",
+              "value": "={{ $json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "c9024355-928d-4a25-95af-204600119ad1",
+              "name": "message",
+              "value": "={{ $json[\"Message / Request Details\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "649b0834-6723-4c0c-85c1-0837de210134",
+              "name": "urgency",
+              "value": "={{ $json.Urgency }}",
+              "type": "string"
+            },
+            {
+              "id": "0b588902-b9b4-41ef-abe6-494ff3e57649",
+              "name": "contact_method",
+              "value": "={{ $json[\"Preferred Contact Method\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "4cee1bea-5ac3-47d7-8865-c25739c71828",
+              "name": "timestamp",
+              "value": "={{ $json.Timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        -128
+      ],
+      "id": "5a5583d0-6b51-4c7f-b017-2b93b9702b60",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3f037a6a-1e4b-4238-ad06-67dbd49a1ad7",
+              "leftValue": "={{ $json.customer_email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "e983eb6a-5eec-4a96-b7d5-3eb9c2407799",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        -128
+      ],
+      "id": "2b2eb301-3949-4c64-9b51-620465620db9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a customer support triage system.\n\nAnalyze the customer request below.\n\nCustomer Name: {{ $json.customer_name }}\nCustomer Email: {{ $json.customer_email }}\nCompany: {{ $json.company }}\nRequest Type: {{ $json.request_type }}\nSubject: {{ $json.subject }}\nMessage: {{ $json.message }}\nUrgency Selected by Customer: {{ $json.urgency }}\nPreferred Contact Method: {{ $json.contact_method }}\n\nReturn ONLY valid JSON in this exact structure:\n\n{\n  \"category\": \"sales|support|billing|general|urgent\",\n  \"priority\": \"low|medium|high|critical\",\n  \"sentiment\": \"positive|neutral|negative\",\n  \"needs_human\": true,\n  \"reason\": \"brief explanation\"\n}\n\nRules:\n\n- Use the actual subject and message as the primary source.\n- Do not classify something as sales merely because it mentions services.\n- Sales = pricing, quotation, purchasing, plans, packages, buying a service, or implementation proposal.\n- Support = technical problems, API errors, integration problems, login problems, or software failures.\n- Billing = invoices, payments, refunds, charges, or billing disputes.\n- General = general questions, available services, or how the company works.\n- Urgent = production outage, severe service failure, security incident, or major business interruption.\n- Critical = immediate human attention is required.\n- High = serious issue requiring quick human attention.\n- Medium = normal request requiring human follow-up.\n- Low = simple informational request",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        944,
+        -128
+      ],
+      "id": "c145377a-481c-4d64-9161-aa7fc564da51",
+      "name": "AI Agent",
+      "retryOnFail": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1016,
+        104
+      ],
+      "id": "f9e2594f-2a03-47b1-9842-7003db93521e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "r5GYFj42IjRQAf8T",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "sales",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0edea0c0-34d8-4575-833b-cd59c2e7daa4"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1e732b78-84bb-4f4d-897c-b2a0ad73d06a",
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "21d69cd6-3f74-4263-ad79-8797c12cf582",
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "billing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "596414bd-3ea0-44af-b4ba-b82541231b21",
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "general",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f59cd7f7-69d5-4ae6-8cf1-6f01d992e762",
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "urgent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        -176
+      ],
+      "id": "e627bb78-dfb0-498d-b206-0422adfae429",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        720,
+        -128
+      ],
+      "id": "238c6d12-3a41-4c3d-8ee3-d9fde33b5303",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -128
+      ],
+      "id": "ba43ddb5-8a21-429e-b031-cb43bb70dca8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output;\n\nconst cleaned = raw\n  .replace(/^```json\\s*/i, '')\n  .replace(/\\s*```$/i, '')\n  .trim();\n\nconst result = JSON.parse(cleaned);\n\nreturn {\n  json: result\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        -128
+      ],
+      "id": "2a88d7a6-8200-4d8c-812b-00c44621a4aa",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "13rbvDK1zI2zWjCMLUH4jUrVRB_dezN3rYpEHxCkd3vw",
+          "mode": "list",
+          "cachedResultName": "Contact Us (Responses)",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1741519875,
+          "mode": "list",
+          "cachedResultName": "sales",
+          "cachedResultUrl": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "={{ $json.category }}",
+            "priority": "={{ $json.priority }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "needs_human": "={{ $json.needs_human }}",
+            "reason": "={{ $json.reason }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "needs_human",
+              "displayName": "needs_human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        -512
+      ],
+      "id": "bbeb5b47-01e3-4e57-9ba4-4846cf0ecc29",
+      "name": "sales",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "01sCOlup6VdDxiRC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "13rbvDK1zI2zWjCMLUH4jUrVRB_dezN3rYpEHxCkd3vw",
+          "mode": "list",
+          "cachedResultName": "Contact Us (Responses)",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1210783321,
+          "mode": "list",
+          "cachedResultName": "support",
+          "cachedResultUrl": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "={{ $json.category }}",
+            "priority": "={{ $json.priority }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "needs_human": "={{ $json.needs_human }}",
+            "reason": "={{ $json.reason }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "needs_human",
+              "displayName": "needs_human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        -320
+      ],
+      "id": "2d4193c1-e9bf-434a-97c7-cf9c19cbe546",
+      "name": "support",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "01sCOlup6VdDxiRC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "13rbvDK1zI2zWjCMLUH4jUrVRB_dezN3rYpEHxCkd3vw",
+          "mode": "list",
+          "cachedResultName": "Contact Us (Responses)",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 877016082,
+          "mode": "list",
+          "cachedResultName": "billing",
+          "cachedResultUrl": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "={{ $json.category }}",
+            "priority": "={{ $json.priority }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "needs_human": "={{ $json.needs_human }}",
+            "reason": "={{ $json.reason }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "needs_human",
+              "displayName": "needs_human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        -128
+      ],
+      "id": "58fd00ed-f4e5-4b7e-a5a1-4cf64ffb9b36",
+      "name": "billing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "01sCOlup6VdDxiRC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "13rbvDK1zI2zWjCMLUH4jUrVRB_dezN3rYpEHxCkd3vw",
+          "mode": "list",
+          "cachedResultName": "Contact Us (Responses)",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 558548611,
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "={{ $json.category }}",
+            "priority": "={{ $json.priority }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "needs_human": "={{ $json.needs_human }}",
+            "reason": "={{ $json.reason }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "needs_human",
+              "displayName": "needs_human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        64
+      ],
+      "id": "d27282b2-361a-4bb9-ae85-cea3689faee2",
+      "name": "general",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "01sCOlup6VdDxiRC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "13rbvDK1zI2zWjCMLUH4jUrVRB_dezN3rYpEHxCkd3vw",
+          "mode": "list",
+          "cachedResultName": "Contact Us (Responses)",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 360769793,
+          "mode": "list",
+          "cachedResultName": "urgent",
+          "cachedResultUrl": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "={{ $json.category }}",
+            "priority": "={{ $json.priority }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "needs_human": "={{ $json.needs_human }}",
+            "reason": "={{ $json.reason }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "needs_human",
+              "displayName": "needs_human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        256
+      ],
+      "id": "0b1f09da-743a-4915-884f-12a5fe980096",
+      "name": "urgent",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "01sCOlup6VdDxiRC",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "sales",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "billing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "general",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "urgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "56a47b46-b24e-4b96-9bee-b9cfbeaf4cd2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "655aa942f78d372cc788cf29047cc359e8983042aa472d0e000fbe02a24489a6"
+  },
+  "nodeGroups": [],
+  "id": "q1lGukdFv7P8cobA",
+  "tags": []
+}
