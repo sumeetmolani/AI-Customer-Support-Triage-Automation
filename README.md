@@ -200,11 +200,11 @@ return {
 Why we use it
 The Switch node needs structured fields that it can evaluate reliably.
 After the Code node, the workflow can use:
-_$json.category
+$json.category
 $json.priority
 $json.sentiment
 $json.needs_human
-Documentation_
+Documentation
 n8n Code node documentation
 ________________________________________
 **4.8 Switch**
